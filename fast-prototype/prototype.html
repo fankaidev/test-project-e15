@@ -817,117 +817,249 @@
             </div>
         </div>
     </div>
-    <script>
-        // Hide all sections except homepage initially
-        const sections = {
-            'homepage': document.querySelector('[id="9:1"]'),
-            'summary': document.querySelector('[id="11:1"]'),
-            'settings': document.querySelector('[id="10:1"]'),
-            'goals': document.querySelector('[id="13:1"]'),
-            'add-food': document.querySelector('[id="12:1"]')
-        };
-
-        // Initially show only homepage
-        function showSection(sectionName) {
-            Object.keys(sections).forEach(key => {
-                if (sections[key]) {
-                    sections[key].style.display = key === sectionName ? 'flex' : 'none';
-                }
-            });
-        }
-
-        // Initialize - show only homepage
-        showSection('homepage');
-
-        // Navigation handlers for homepage
-        const homeNav = sections.homepage.querySelector('[id="9:103"]');
-        if (homeNav) {
-            // Homepage nav - 首页 active
-            const homeNavItems = homeNav.querySelectorAll('[id="9:104"], [id="9:108"], [id="9:112"], [id="9:116"], [id="9:120"]');
-            homeNavItems[0]?.addEventListener('click', () => showSection('homepage')); // 首页
-            homeNavItems[1]?.addEventListener('click', () => showSection('add-food')); // 记录
-            homeNavItems[2]?.addEventListener('click', () => showSection('summary')); // 汇总
-            homeNavItems[3]?.addEventListener('click', () => showSection('goals')); // 目标
-            homeNavItems[4]?.addEventListener('click', () => showSection('settings')); // 我的
-        }
-
-        // Navigation handlers for summary page
-        const summaryNav = sections.summary?.querySelector('[id="11:156"]');
-        if (summaryNav) {
-            const summaryNavItems = summaryNav.querySelectorAll('[id="11:157"], [id="11:161"], [id="11:165"], [id="11:169"], [id="11:173"]');
-            summaryNavItems[0]?.addEventListener('click', () => showSection('homepage')); // 首页
-            summaryNavItems[1]?.addEventListener('click', () => showSection('add-food')); // 记录
-            summaryNavItems[2]?.addEventListener('click', () => showSection('summary')); // 汇总
-            summaryNavItems[3]?.addEventListener('click', () => showSection('goals')); // 目标
-            summaryNavItems[4]?.addEventListener('click', () => showSection('settings')); // 我的
-        }
-
-        // Navigation handlers for settings page
-        const settingsNav = sections.settings?.querySelector('[id="10:145"]');
-        if (settingsNav) {
-            const settingsNavItems = settingsNav.querySelectorAll('[id="10:146"], [id="10:150"], [id="10:154"], [id="10:158"], [id="10:162"]');
-            settingsNavItems[0]?.addEventListener('click', () => showSection('homepage')); // 首页
-            settingsNavItems[1]?.addEventListener('click', () => showSection('add-food')); // 记录
-            settingsNavItems[2]?.addEventListener('click', () => showSection('summary')); // 汇总
-            settingsNavItems[3]?.addEventListener('click', () => showSection('goals')); // 目标
-            settingsNavItems[4]?.addEventListener('click', () => showSection('settings')); // 我的
-        }
-
-        // Navigation handlers for goals page
-        const goalsNav = sections.goals?.querySelector('[id="13:147"]');
-        if (goalsNav) {
-            const goalsNavItems = goalsNav.querySelectorAll('[id="13:148"], [id="13:152"], [id="13:156"], [id="13:160"], [id="13:164"]');
-            goalsNavItems[0]?.addEventListener('click', () => showSection('homepage')); // 首页
-            goalsNavItems[1]?.addEventListener('click', () => showSection('add-food')); // 记录
-            goalsNavItems[2]?.addEventListener('click', () => showSection('summary')); // 汇总
-            goalsNavItems[3]?.addEventListener('click', () => showSection('goals')); // 目标
-            goalsNavItems[4]?.addEventListener('click', () => showSection('settings')); // 我的
-        }
-
-        // Back button handlers
-        sections.summary?.querySelector('[id="11:10"]')?.addEventListener('click', () => showSection('homepage'));
-        sections.settings?.querySelector('[id="10:10"]')?.addEventListener('click', () => showSection('homepage'));
-        sections.goals?.querySelector('[id="13:10"]')?.addEventListener('click', () => showSection('homepage'));
-        sections['add-food']?.querySelector('[id="12:10"]')?.addEventListener('click', () => showSection('homepage'));
-
-        // Quick record buttons on homepage
-        const quickRecordButtons = sections.homepage?.querySelectorAll('[id="9:54"], [id="9:58"], [id="9:62"]');
-        quickRecordButtons?.forEach(btn => {
-            btn?.addEventListener('click', () => showSection('add-food'));
-        });
-
-        // Calendar button on summary page header
-        sections.summary?.querySelector('[id="11:13"]')?.addEventListener('click', () => showSection('homepage'));
-
-        // Add hover effects
-        function addHoverEffect(elements) {
-            elements?.forEach(element => {
-                if (element) {
-                    element.style.cursor = 'pointer';
-                    element.addEventListener('mouseenter', () => {
-                        element.style.opacity = '0.8';
-                        element.style.transform = 'scale(0.98)';
-                    });
-                    element.addEventListener('mouseleave', () => {
-                        element.style.opacity = '1';
-                        element.style.transform = 'scale(1)';
-                    });
-                }
-            });
-        }
-
-        // Add hover effects to clickable elements
-        const allClickableElements = [
-            ...Array.from(document.querySelectorAll('nav [id]')),
-            ...Array.from(document.querySelectorAll('button')),
-            sections.summary?.querySelector('[id="11:10"]'),
-            sections.settings?.querySelector('[id="10:10"]'),
-            sections.goals?.querySelector('[id="13:10"]'),
-            sections['add-food']?.querySelector('[id="12:10"]')
-        ].filter(el => el);
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Helper function for safe class addition with style preservation
+    function addClassesSafely(elementId, newClasses) {
+        const element = document.querySelector(`[id="${elementId}"]`);
+        if (!element) return;
         
-        addHoverEffect(allClickableElements);
+        const classesToAdd = newClasses.split(' ');
+        const existingClasses = element.className.split(' ');
+        
+        classesToAdd.forEach(newClass => {
+            // Check if this class conflicts with existing styles
+            const prefix = newClass.split('-')[0];
+            const hasConflict = existingClasses.some(existing => 
+                existing.startsWith(prefix + '-') && 
+                ['bg', 'border', 'text'].includes(prefix)
+            );
+            
+            // Only add if no conflict or if it's a safe enhancement class
+            if (!hasConflict || 
+                newClass.startsWith('hover:') || 
+                newClass.startsWith('active:') ||
+                newClass.startsWith('focus:') ||
+                newClass.startsWith('transition') ||
+                newClass.includes('brightness') ||
+                newClass.includes('scale') ||
+                newClass.includes('shadow') ||
+                newClass === 'cursor-pointer') {
+                element.classList.add(newClass);
+            }
+        });
+    }
 
-    </script>
+    // Extract and manage page IDs
+    const allPageIds = ['9:1', '10:1', '11:1', '12:1', '13:1'];
+
+    // Initialize page display - hide all pages first
+    allPageIds.forEach(pageId => {
+        const page = document.querySelector(`[id="${pageId}"]`);
+        if (page) {
+            page.style.display = 'none';
+        }
+    });
+
+    // Show homepage (9:1 appears to be the main dashboard)
+    const homePage = document.querySelector('[id="9:1"]');
+    if (homePage) {
+        homePage.style.display = 'flex';
+    }
+
+    // Page navigation function
+    function showPage(pageId) {
+        // Hide all pages
+        allPageIds.forEach(id => {
+            const page = document.querySelector(`[id="${id}"]`);
+            if (page) {
+                page.style.display = 'none';
+            }
+        });
+        
+        // Show target page
+        const targetPage = document.querySelector(`[id="${pageId}"]`);
+        if (targetPage) {
+            targetPage.style.display = 'flex';
+        }
+    }
+
+    // Enhance interactive elements with appropriate classes
+    
+    // Primary action buttons (green background buttons)
+    const primaryButtons = [
+        '9:54', // 拍照识别 button
+        '9:109', // 记录 button in nav
+        '12:113' // 添加到今日饮食 button
+    ];
+    primaryButtons.forEach(id => {
+        addClassesSafely(id, 'hover:brightness-90 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-200');
+    });
+
+    // Secondary action buttons
+    const secondaryButtons = [
+        '9:58', '9:62', // 手动添加, 扫码录入 buttons
+        '11:19', '11:24', // Date navigation arrows
+        '11:27', '11:28', '11:29' // 日/周/月 toggle buttons
+    ];
+    secondaryButtons.forEach(id => {
+        addClassesSafely(id, 'hover:brightness-95 active:scale-98 cursor-pointer transition-all duration-200');
+    });
+
+    // Navigation elements (bottom nav and header nav)
+    const navElements = [
+        '9:104', '9:108', '9:112', '9:116', '9:120', // Bottom nav items
+        '11:10', '11:13', // Header back and calendar buttons
+        '9:18', '9:19' // Calendar icon in header
+    ];
+    navElements.forEach(id => {
+        addClassesSafely(id, 'hover:brightness-95 hover:opacity-90 active:brightness-90 cursor-pointer transition-all duration-200');
+    });
+
+    // Form inputs and interactive areas
+    const interactiveAreas = [
+        '9:11', '9:30', '9:67', '9:86', // Main dashboard cards
+        '11:17', '11:32', '11:72', // Summary page cards
+        '12:15', '12:37', '12:70' // Detail page cards
+    ];
+    interactiveAreas.forEach(id => {
+        addClassesSafely(id, 'hover:shadow-lg hover:scale-102 active:scale-98 cursor-pointer transition-all duration-200');
+    });
+
+    // Icon buttons and small interactive elements
+    const iconButtons = [
+        '9:71', '9:82', '9:95', // Dashboard icons
+        '9:34', '9:40', '9:46', // Nutrition icons
+        '11:49', '11:56', '11:63' // Summary page icons
+    ];
+    iconButtons.forEach(id => {
+        addClassesSafely(id, 'hover:brightness-90 hover:scale-110 active:scale-90 cursor-pointer transition-all duration-200');
+    });
+
+    // Set up click event handling for navigation
+    
+    // Bottom navigation mapping
+    const navMappings = {
+        '9:104': '9:1',  // 首页 -> Dashboard page
+        '9:108': '10:1', // 记录 -> Food recording page
+        '9:112': '11:1', // 汇总 -> Summary page  
+        '9:116': '13:1', // 目标 -> Goals page
+        '9:120': '12:1'  // 我的 -> Profile page
+    };
+
+    // Add click handlers for bottom navigation
+    Object.entries(navMappings).forEach(([navId, targetPageId]) => {
+        const navElement = document.querySelector(`[id="${navId}"]`);
+        if (navElement) {
+            navElement.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(targetPageId);
+                
+                // Update nav visual state
+                Object.keys(navMappings).forEach(id => {
+                    const nav = document.querySelector(`[id="${id}"]`);
+                    if (nav) {
+                        // Reset nav colors
+                        const icon = nav.querySelector('i');
+                        const text = nav.nextElementSibling || nav.querySelector('span');
+                        if (icon) icon.style.color = 'rgba(90, 90, 90, 1)';
+                        if (text) text.style.color = 'rgba(90, 90, 90, 1)';
+                    }
+                });
+                
+                // Highlight active nav
+                const activeNav = document.querySelector(`[id="${navId}"]`);
+                if (activeNav) {
+                    const icon = activeNav.querySelector('i');
+                    const text = activeNav.nextElementSibling || activeNav.querySelector('span');
+                    if (icon) icon.style.color = 'rgba(140, 152, 94, 1)';
+                    if (text) text.style.color = 'rgba(140, 152, 94, 1)';
+                }
+            });
+        }
+    });
+
+    // Back button functionality
+    const backButtons = ['11:10']; // Back arrow in header
+    backButtons.forEach(id => {
+        const backButton = document.querySelector(`[id="${id}"]`);
+        if (backButton) {
+            backButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage('9:1'); // Go back to dashboard
+            });
+        }
+    });
+
+    // Food action buttons navigation
+    const foodActionMappings = {
+        '9:54': '10:1', // 拍照识别 -> Food recording
+        '9:58': '10:1', // 手动添加 -> Food recording
+        '9:62': '10:1', // 扫码录入 -> Food recording
+        '12:113': '9:1' // 添加到今日饮食 -> Back to dashboard
+    };
+
+    Object.entries(foodActionMappings).forEach(([buttonId, targetPageId]) => {
+        const button = document.querySelector(`[id="${buttonId}"]`);
+        if (button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(targetPageId);
+            });
+        }
+    });
+
+    // Calendar and date navigation (functional but stays on same page)
+    const dateNavigation = ['11:19', '11:24', '9:18', '11:13'];
+    dateNavigation.forEach(id => {
+        const element = document.querySelector(`[id="${id}"]`);
+        if (element) {
+            element.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Add visual feedback
+                element.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    element.style.transform = '';
+                }, 150);
+            });
+        }
+    });
+
+    // Time period toggle buttons (日/周/月)
+    const periodButtons = ['11:27', '11:28', '11:29'];
+    periodButtons.forEach((id, index) => {
+        const button = document.querySelector(`[id="${id}"]`);
+        if (button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Reset all period buttons
+                periodButtons.forEach(btnId => {
+                    const btn = document.querySelector(`[id="${btnId}"]`);
+                    if (btn) {
+                        btn.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                        btn.style.color = 'rgba(31, 31, 31, 1)';
+                    }
+                });
+                
+                // Highlight clicked button
+                button.style.backgroundColor = 'rgba(140, 152, 94, 1)';
+                button.style.color = 'rgba(247, 245, 244, 1)';
+            });
+        }
+    });
+
+    // Set initial active nav state for homepage
+    const homeNav = document.querySelector('[id="9:104"]');
+    if (homeNav) {
+        const icon = homeNav.querySelector('i');
+        const text = homeNav.nextElementSibling || homeNav.querySelector('span');
+        if (icon) icon.style.color = 'rgba(140, 152, 94, 1)';
+        if (text) text.style.color = 'rgba(140, 152, 94, 1)';
+    }
+
+    console.log('Interactive prototype initialized successfully!');
+});
+</script>
 </body>
 </html>
